@@ -15,15 +15,17 @@ const App = () => {
 
   const getAccessToken = () => {
     if (!accessToken) {
-      window.location.href = `https://accounts.spotify.com/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join('%20')}&response_type=token&show_dialog=true`;
+      window.location.href = `https://accounts.spotify.com/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join(
+        '%20'
+      )}&response_type=token&show_dialog=true`;
     }
-  }
+  };
 
   useEffect(() => {
     const savedToken = localStorage.getItem('spotify_access_token');
     const savedTimestamp = localStorage.getItem('spotify_expiry_date');
 
-    if (savedToken && (Number(savedTimestamp) > Number(new Date()))) {
+    if (savedToken && Number(savedTimestamp) > Number(new Date())) {
       setAccessToken(savedToken);
     }
 
@@ -32,11 +34,11 @@ const App = () => {
         fetch('https://api.spotify.com/v1/me', {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          }
+            Authorization: `Bearer ${accessToken}`,
+          },
         })
           .then((res: any) => res.json())
-          .then(res => {
+          .then((res) => {
             setUser({
               name: res.display_name,
               followers: res.followers.total,
@@ -46,7 +48,7 @@ const App = () => {
           })
           .catch((err: string) => console.error('Oh no!', err));
       }
-    }
+    };
 
     if (window.location.hash) {
       const hash: any = window.location.hash
@@ -62,7 +64,10 @@ const App = () => {
       const now = new Date();
       setAccessToken(hash.access_token);
       localStorage.setItem('spotify_access_token', hash.access_token);
-      localStorage.setItem('spotify_expiry_date', `${now.setHours(now.getHours() + 1)}`);
+      localStorage.setItem(
+        'spotify_expiry_date',
+        `${now.setHours(now.getHours() + 1)}`
+      );
 
       if (accessToken) {
         window.location.hash = '';
@@ -73,25 +78,24 @@ const App = () => {
   }, [accessToken, user]);
 
   useEffect(() => {
-    const getData = (
-      type = 'artists',
-      term = 'short',
-      amount = 10,
-    ) => {
+    const getData = (type = 'artists', term = 'short', amount = 10) => {
       if (accessToken && !user.name) {
-        fetch(`https://api.spotify.com/v1/me/top/${type}?time_range=${term}_term&limit=${amount}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
+        fetch(
+          `https://api.spotify.com/v1/me/top/${type}?time_range=${term}_term&limit=${amount}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           }
-        })
+        )
           .then((res: any) => res.json())
           .then(({ items }) => {
             switch (type) {
-              case ('artists'):
-                setArtists(items)
+              case 'artists':
+                setArtists(items);
                 break;
-              case ('tracks'):
+              case 'tracks':
                 setTracks(items);
                 break;
               default:
@@ -100,32 +104,38 @@ const App = () => {
           })
           .catch((err: string) => console.error('Oh no!', err));
       }
-    }
+    };
     getData('artists', 'short', 20);
     getData('tracks', 'short', 20);
   }, [accessToken, artists, user.name]);
 
   return (
     <>
-      {!accessToken ? <button onClick={getAccessToken}>Authenticate with Spotify</button> : (
+      {!accessToken ? (
+        <button onClick={getAccessToken} type="button">Authenticate with Spotify</button>
+      ) : (
         <>
           {user?.name && <h1>Welcome back, {user.name}</h1>}
           <h2>My favourite artists</h2>
           <ol>
-          {artists.map(artist => (
-            <li key={artist.id}><strong>{artist.name}</strong></li>
-          ))}
+            {artists.map((artist) => (
+              <li key={artist.id}>
+                <strong>{artist.name}</strong>
+              </li>
+            ))}
           </ol>
           <h2>My favourite tracks</h2>
           <ol>
-            {tracks.map(track => (
-              <li key={track.id}><strong>{track.name}</strong> by {track.artists[0].name}</li>
+            {tracks.map((track) => (
+              <li key={track.id}>
+                <strong>{track.name}</strong> by {track.artists[0].name}
+              </li>
             ))}
           </ol>
         </>
       )}
     </>
   );
-}
+};
 
 export default App;
