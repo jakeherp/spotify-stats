@@ -13,8 +13,8 @@ const App = () => {
   const [artists, setArtists] = useState<any[]>();
   const [tracks, setTracks] = useState<any[]>();
 
-  const clientId = '79d6320d37564530a02c332d96377012';
-  const redirectUri = 'http://localhost:3000';
+  const clientId = process.env.REACT_APP_CLIENT_ID;
+  const redirectUri = process.env.REACT_APP_REDIRECT_URL;
   const scopes = ['user-top-read'];
 
   const getAccessToken = () => {
@@ -125,7 +125,10 @@ const App = () => {
             {user?.name && (
               <>
                 <h1>Hey {user.name}!</h1>
-                <p>Here's a list of your most listened to artists and tracks on Spotify.</p>
+                <p>
+                  Here's a list of your most listened to artists and tracks on
+                  Spotify.
+                </p>
               </>
             )}
           </>
